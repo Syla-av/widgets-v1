@@ -35,44 +35,87 @@
 
 <h1>Widgets V1</h1>
 
-<div class="widget">
-  <h2>Temporizador (Máx 5 minutos)</h2>
+<div id="timerWidget" style="padding:20px; border:1px solid #ccc; width:250px;">
+  <h3>Temporizador</h3>
 
-  <label>Minutos:</label>
-  <select id="minutes">
-    <option value="0">0</option>
-    <option value="1">1</option>
-    <option value="2">2</option>
-    <option value="3">3</option>
-    <option value="4">4</option>
-    <option value="5">5</option>
-  </select>
+  <div style="display:flex; gap:10px; margin-bottom:10px;">
+    <div>
+      <label>Min:</label><br/>
+      <select id="minutesSelect">
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+      </select>
+    </div>
 
-  <label>Segundos:</label>
-  <select id="seconds"></select>
+    <div>
+      <label>Seg:</label><br/>
+      <select id="secondsSelect">
+        <option value="0">0</option>
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="30">30</option>
+        <option value="40">40</option>
+        <option value="50">50</option>
+      </select>
+    </div>
+  </div>
 
-  <br>
+  <div style="font-size:28px; margin-bottom:10px;" id="display">
+    00:00
+  </div>
+
   <button onclick="startTimer()">Iniciar</button>
-  <button onclick="resetTimer()">Reset</button>
-
-  <div id="countdown" class="timer-display">00:00</div>
-</div>
-
-<div class="widget">
-  <h2>Calculadora</h2>
-  <input type="number" id="num1">
-  <select id="operator">
-    <option value="+">+</option>
-    <option value="-">-</option>
-    <option value="*">*</option>
-    <option value="/">/</option>
-  </select>
-  <input type="number" id="num2">
-  <button onclick="calculate()">=</button>
-  <p id="result"></p>
 </div>
 
 <script>
+  let countdown;
+  let totalSeconds = 0;
+
+  function startTimer() {
+    const minutes = parseInt(document.getElementById("minutesSelect").value);
+    const seconds = parseInt(document.getElementById("secondsSelect").value);
+
+    totalSeconds = minutes * 60 + seconds;
+
+    if (totalSeconds === 0) {
+      alert("Selecciona un tiempo mayor a 0");
+      return;
+    }
+
+    if (totalSeconds > 300) {
+      alert("Máximo 5 minutos");
+      return;
+    }
+
+    clearInterval(countdown);
+
+    updateDisplay();
+
+    countdown = setInterval(() => {
+      totalSeconds--;
+      updateDisplay();
+
+      if (totalSeconds <= 0) {
+        clearInterval(countdown);
+        alert("Tiempo terminado");
+      }
+    }, 1000);
+  }
+
+  function updateDisplay() {
+    const min = Math.floor(totalSeconds / 60);
+    const sec = totalSeconds % 60;
+
+    document.getElementById("display").innerText =
+      String(min).padStart(2, "0") + ":" +
+      String(sec).padStart(2, "0");
+  }
+</script>
+
 let interval;
 let totalSeconds = 0;
 
