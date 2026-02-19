@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Widgets V1</title>
+  <style>
+    body {
+      font-family: Arial;
+      padding: 40px;
+    }
+    .widget {
+      border: 1px solid #ccc;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+    }
+    button {
+      padding: 10px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Widgets V1</h1>
+
+<div class="widget">
+  <h2>Temporizador</h2>
+  <input type="datetime-local" id="dateInput">
+  <button onclick="startTimer()">Iniciar</button>
+  <p id="countdown"></p>
+</div>
+
+<div class="widget">
+  <h2>Calculadora</h2>
+  <input type="number" id="num1">
+  <select id="operator">
+    <option value="+">+</option>
+    <option value="-">-</option>
+    <option value="*">*</option>
+    <option value="/">/</option>
+  </select>
+  <input type="number" id="num2">
+  <button onclick="calculate()">=</button>
+  <p id="result"></p>
+</div>
+
+<script>
+function startTimer() {
+  const target = new Date(document.getElementById("dateInput").value);
+  const interval = setInterval(() => {
+    const now = new Date();
+    const diff = target - now;
+    if (diff <= 0) {
+      document.getElementById("countdown").innerText = "Tiempo terminado";
+      clearInterval(interval);
+      return;
+    }
+    const seconds = Math.floor(diff / 1000);
+    document.getElementById("countdown").innerText = seconds + " segundos restantes";
+  }, 1000);
+}
+
+function calculate() {
+  const n1 = parseFloat(document.getElementById("num1").value);
+  const n2 = parseFloat(document.getElementById("num2").value);
+  const op = document.getElementById("operator").value;
+  let result;
+
+  if (op === "+") result = n1 + n2;
+  if (op === "-") result = n1 - n2;
+  if (op === "*") result = n1 * n2;
+  if (op === "/") result = n1 / n2;
+
+  document.getElementById("result").innerText = "Resultado: " + result;
+}
+</script>
+
+</body>
+</html>
