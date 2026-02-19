@@ -13,10 +13,21 @@
       padding: 20px;
       margin-bottom: 20px;
       border-radius: 10px;
+      max-width: 400px;
     }
     button {
       padding: 10px;
       margin-top: 10px;
+      cursor: pointer;
+    }
+    select {
+      padding: 5px;
+      margin-right: 5px;
+    }
+    .timer-display {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 15px;
     }
   </style>
 </head>
@@ -25,10 +36,26 @@
 <h1>Widgets V1</h1>
 
 <div class="widget">
-  <h2>Temporizador</h2>
-  <input type="datetime-local" id="dateInput">
+  <h2>Temporizador (Máx 5 minutos)</h2>
+
+  <label>Minutos:</label>
+  <select id="minutes">
+    <option value="0">0</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+  </select>
+
+  <label>Segundos:</label>
+  <select id="seconds"></select>
+
+  <br>
   <button onclick="startTimer()">Iniciar</button>
-  <p id="countdown"></p>
+  <button onclick="resetTimer()">Reset</button>
+
+  <div id="countdown" class="timer-display">00:00</div>
 </div>
 
 <div class="widget">
@@ -46,33 +73,84 @@
 </div>
 
 <script>
+let interval;
+let totalSeconds = 0;
+
+// Llenar selector de segundos automáticamente (0–59)
+const secondsSelect = document.getElementById("seconds");
+for (let i = 0; i < 60; i++) {
+  const option = document.createElement("option");
+  option.value = i;
+  option.text = i;
+  secondsSelect.appendChild(option);
+}
+
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+}
+
 function startTimer() {
-  const target = new Date(document.getElementById("dateInput").value);
-  const interval = setInterval(() => {
-    const now = new Date();
-    const diff = target - now;
-    if (diff <= 0) {
-      document.getElementById("countdown").innerText = "Tiempo terminado";
+  clearInterval(interval);
+
+  const minutes = parseInt(document.getElementById("minutes").value);
+  const seconds = parseInt(document.getElementById("seconds").value);
+
+  totalSeconds = minutes * 60 + seconds;
+
+  if (totalSeconds <= 0) {
+    alert("Selecciona un tiempo mayor a 0.");
+    return;
+  }
+
+  if (totalSeconds > 300) {
+    alert("El máximo permitido es 5 minutos.");
+    return;
+  }
+
+  document.getElementById("countdown").innerText = formatTime(totalSeconds);
+
+  interval = setInterval(() => {
+    totalSeconds--;
+    document.getElementById("countdown").innerText = formatTime(totalSeconds);
+
+    if (totalSeconds <= 0) {
       clearInterval(interval);
-      return;
+      document.getElementById("countdown").innerText = "Tiempo terminado";
     }
-    const seconds = Math.floor(diff / 1000);
-    document.getElementById("countdown").innerText = seconds + " segundos restantes";
   }, 1000);
+}
+
+function resetTimer() {
+  clearInterval(interval);
+  document.getElementById("countdown").innerText = "00:00";
 }
 
 function calculate() {
   const n1 = parseFloat(document.getElementById("num1").value);
   const n2 = parseFloat(document.getElementById("num2").value);
   const op = document.getElementById("operator").value;
+
+  if (isNaN(n1) || isNaN(n2)) {
+    alert("Ingresa valores numéricos válidos.");
+    return;
+  }
+
   let result;
 
   if (op === "+") result = n1 + n2;
   if (op === "-") result = n1 - n2;
   if (op === "*") result = n1 * n2;
-  if (op === "/") result = n1 / n2;
+  if (op === "/") {
+    if (n2 === 0) {
+      alert("No se puede dividir entre 0.");
+      return;
+    }
+    result = n1 / n2;
+  }
 
-  document.getElementById("result").innerText = "Resultado: " + result;
+  document.getElementById("result").innerText = "Resultado: " + result.toFixed(2);
 }
 </script>
 
