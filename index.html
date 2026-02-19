@@ -1,223 +1,146 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Widgets V1</title>
+  <title>Mis Widgets</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     body {
-      font-family: Arial;
-      padding: 40px;
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
+
     .widget {
-      border: 1px solid #ccc;
-      padding: 20px;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      width: 300px;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 15px;
+    }
+
+    .time-selectors {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
       margin-bottom: 20px;
-      border-radius: 10px;
-      max-width: 400px;
     }
-    button {
-      padding: 10px;
-      margin-top: 10px;
-      cursor: pointer;
-    }
+
     select {
       padding: 5px;
-      margin-right: 5px;
+      font-size: 16px;
     }
-    .timer-display {
-      font-size: 24px;
+
+    .display {
+      font-size: 36px;
+      margin-bottom: 20px;
       font-weight: bold;
-      margin-top: 15px;
+    }
+
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 6px;
+      background: #4CAF50;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #45a049;
     }
   </style>
 </head>
 <body>
 
-<h1>Widgets V1</h1>
+  <div class="widget">
+    <h2>Temporizador</h2>
 
-<div class="widget">
-  <h2>Temporizador (Máx 5 minutos)</h2>
+    <div class="time-selectors">
+      <div>
+        <label>Min</label><br>
+        <select id="minutesSelect">
+          <option value="0">0</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+      </div>
 
-  <label>Minutos:</label>
-  <select id="minutes">
-    <option value="0">0</option>
-    <option value="1">1</option>
-    <option value="2">2</option>
-    <option value="3">3</option>
-    <option value="4">4</option>
-    <option value="5">5</option>
-  </select>
-
-  <label>Segundos:</label>
-  <select id="seconds"></select>
-
-  <br>
-  <button onclick="startTimer()">Iniciar</button>
-  <button onclick="resetTimer()">Reset</button>
-
-<div id="timerWidget" style="padding:20px; border:1px solid #ccc; width:250px;">
-  <h3>Temporizador</h3>
-
-  <div style="display:flex; gap:10px; margin-bottom:10px;">
-    <div>
-      <label>Min:</label><br/>
-      <select id="minutesSelect">
-        <option value="0">0</option>
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-      </select>
+      <div>
+        <label>Seg</label><br>
+        <select id="secondsSelect">
+          <option value="0">00</option>
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="30">30</option>
+          <option value="40">40</option>
+          <option value="50">50</option>
+        </select>
+      </div>
     </div>
 
-    <div>
-      <label>Seg:</label><br/>
-      <select id="secondsSelect">
-        <option value="0">0</option>
-        <option value="10">10</option>
-        <option value="20">20</option>
-        <option value="30">30</option>
-        <option value="40">40</option>
-        <option value="50">50</option>
-      </select>
-    </div>
+    <div class="display" id="display">00:00</div>
+
+    <button onclick="startTimer()">Iniciar</button>
   </div>
 
-  <div style="font-size:28px; margin-bottom:10px;" id="display">
-    00:00
-  </div>
+  <script>
+    let countdown;
+    let totalSeconds = 0;
 
-  <button onclick="startTimer()">Iniciar</button>
-</div>
+    function startTimer() {
+      const minutes = parseInt(document.getElementById("minutesSelect").value);
+      const seconds = parseInt(document.getElementById("secondsSelect").value);
 
-<script>
-  let countdown;
-  let totalSeconds = 0;
+      totalSeconds = minutes * 60 + seconds;
 
-  function startTimer() {
-    const minutes = parseInt(document.getElementById("minutesSelect").value);
-    const seconds = parseInt(document.getElementById("secondsSelect").value);
+      if (totalSeconds === 0) {
+        alert("Selecciona un tiempo mayor a 0");
+        return;
+      }
 
-    totalSeconds = minutes * 60 + seconds;
+      if (totalSeconds > 300) {
+        alert("Máximo 5 minutos");
+        return;
+      }
 
-    if (totalSeconds === 0) {
-      alert("Selecciona un tiempo mayor a 0");
-      return;
-    }
+      clearInterval(countdown);
 
-    if (totalSeconds > 300) {
-      alert("Máximo 5 minutos");
-      return;
-    }
-
-    clearInterval(countdown);
-
-    updateDisplay();
-
-    countdown = setInterval(() => {
-      totalSeconds--;
       updateDisplay();
 
-      if (totalSeconds <= 0) {
-        clearInterval(countdown);
-        alert("Tiempo terminado");
-      }
-    }, 1000);
-  }
+      countdown = setInterval(() => {
+        totalSeconds--;
+        updateDisplay();
 
-  function updateDisplay() {
-    const min = Math.floor(totalSeconds / 60);
-    const sec = totalSeconds % 60;
-
-    document.getElementById("display").innerText =
-      String(min).padStart(2, "0") + ":" +
-      String(sec).padStart(2, "0");
-  }
-</script>
-
-
-<script>
-let interval;
-let totalSeconds = 0;
-
-// Llenar selector de segundos automáticamente (0–59)
-const secondsSelect = document.getElementById("seconds");
-for (let i = 0; i < 60; i++) {
-  const option = document.createElement("option");
-  option.value = i;
-  option.text = i;
-  secondsSelect.appendChild(option);
-}
-
-function formatTime(seconds) {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-}
-
-function startTimer() {
-  clearInterval(interval);
-
-  const minutes = parseInt(document.getElementById("minutes").value);
-  const seconds = parseInt(document.getElementById("seconds").value);
-
-  totalSeconds = minutes * 60 + seconds;
-
-  if (totalSeconds <= 0) {
-    alert("Selecciona un tiempo mayor a 0.");
-    return;
-  }
-
-  if (totalSeconds > 300) {
-    alert("El máximo permitido es 5 minutos.");
-    return;
-  }
-
-  document.getElementById("countdown").innerText = formatTime(totalSeconds);
-
-  interval = setInterval(() => {
-    totalSeconds--;
-    document.getElementById("countdown").innerText = formatTime(totalSeconds);
-
-    if (totalSeconds <= 0) {
-      clearInterval(interval);
-      document.getElementById("countdown").innerText = "Tiempo terminado";
+        if (totalSeconds <= 0) {
+          clearInterval(countdown);
+          alert("Tiempo terminado");
+        }
+      }, 1000);
     }
-  }, 1000);
-}
 
-function resetTimer() {
-  clearInterval(interval);
-  document.getElementById("countdown").innerText = "00:00";
-}
+    function updateDisplay() {
+      const min = Math.floor(totalSeconds / 60);
+      const sec = totalSeconds % 60;
 
-function calculate() {
-  const n1 = parseFloat(document.getElementById("num1").value);
-  const n2 = parseFloat(document.getElementById("num2").value);
-  const op = document.getElementById("operator").value;
-
-  if (isNaN(n1) || isNaN(n2)) {
-    alert("Ingresa valores numéricos válidos.");
-    return;
-  }
-
-  let result;
-
-  if (op === "+") result = n1 + n2;
-  if (op === "-") result = n1 - n2;
-  if (op === "*") result = n1 * n2;
-  if (op === "/") {
-    if (n2 === 0) {
-      alert("No se puede dividir entre 0.");
-      return;
+      document.getElementById("display").innerText =
+        String(min).padStart(2, "0") + ":" +
+        String(sec).padStart(2, "0");
     }
-    result = n1 / n2;
-  }
-
-  document.getElementById("result").innerText = "Resultado: " + result.toFixed(2);
-}
-</script>
+  </script>
 
 </body>
 </html>
